@@ -36,8 +36,9 @@ class Genre(models.Model):
 class Play(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    genres = models.ManyToManyField(Genre)
-    actors = models.ManyToManyField(Actor)
+    duration = models.IntegerField()
+    genres = models.ManyToManyField(Genre, related_name="plays")
+    actors = models.ManyToManyField(Actor, related_name="plays")
 
     class Meta:
         ordering = ["title"]
@@ -46,3 +47,7 @@ class Play(models.Model):
         return self.title
 
 
+class Performance(models.Model):
+    play = models.ForeignKey(Play, related_name="performances", on_delete=models.CASCADE)
+    theatre_hall = models.ForeignKey(TheatreHall, related_name="performances", on_delete=models.CASCADE)
+    show_time = models.DateTimeField()
