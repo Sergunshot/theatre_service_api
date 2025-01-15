@@ -51,7 +51,11 @@ class Play(models.Model):
 
 class Performance(models.Model):
     play = models.ForeignKey(Play, related_name="performances", on_delete=models.CASCADE)
-    theatre_hall = models.ForeignKey(TheatreHall, related_name="performances", on_delete=models.CASCADE)
+    theatre_hall = models.ForeignKey(
+        TheatreHall,
+        related_name="performances",
+        on_delete=models.CASCADE
+    )
     show_time = models.DateTimeField()
 
 
@@ -64,3 +68,21 @@ class Reservation(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class Ticket(models.Model):
+    row = models.IntegerField()
+    seat = models.IntegerField()
+    performance = models.ForeignKey(
+        Performance,
+        related_name="tickets",
+        on_delete=models.CASCADE
+    )
+    reservation = models.ForeignKey(
+        Reservation,
+        related_name="tickets",
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{str(self.performance)} (row: {self.row}, seat: {self.seat})"
