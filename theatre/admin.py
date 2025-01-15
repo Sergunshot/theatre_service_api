@@ -6,7 +6,8 @@ from .models import (
     Genre,
     Play,
     Performance,
-    Reservation
+    Reservation,
+    Ticket
 )
 
 admin.site.register(TheatreHall)
@@ -15,3 +16,4 @@ admin.site.register(Genre)
 admin.site.register(Play)
 admin.site.register(Performance)
 admin.site.register(Reservation)
+admin.site.register(Ticket)
