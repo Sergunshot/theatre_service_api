@@ -6,14 +6,16 @@ from theatre.models import (
     Actor,
     Genre,
     Play,
-    Performance
+    Performance,
+    Reservation
 )
 from theatre.serializers import (
     TheatreHallSerializer,
     ActorSerializer,
     GenreSerializer,
     PlaySerializer,
-    PerformanceSerializer
+    PerformanceSerializer,
+    ReservationSerializer
 )
 
 
@@ -44,3 +46,8 @@ class PlayViewset(viewsets.ModelViewSet):
 class PerformanceViewset(viewsets.ModelViewSet):
     queryset = Performance.objects.all()
     serializer_class = PerformanceSerializer
+
+
+class ReservationViewset(viewsets.ModelViewSet):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
