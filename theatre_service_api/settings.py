@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "theatre",
     "user",
+    "rest_framework.authtoken",
     "debug_toolbar",
 ]
 
