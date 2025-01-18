@@ -116,7 +116,11 @@ class PerformanceViewset(viewsets.ModelViewSet):
         return PerformanceSerializer
 
 
-class ReservationViewset(viewsets.ModelViewSet):
+class ReservationViewset(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet
+):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
 
