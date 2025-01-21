@@ -4,6 +4,7 @@ from django.db.models import F, Count
 from rest_framework import mixins, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.viewsets import GenericViewSet
+from theatre.permissions import IsAdminAllORIsAuthenticatedORReadOnly
 
 from theatre.models import (
     TheatreHall,
@@ -32,24 +33,28 @@ class TheatreHallViewset(
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminAllORIsAuthenticatedORReadOnly,)
 
 
 class ActorViewset(viewsets.ModelViewSet):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminAllORIsAuthenticatedORReadOnly,)
 
 
 class GenreViewset(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminAllORIsAuthenticatedORReadOnly,)
 
 
 class PlayViewset(viewsets.ModelViewSet):
     queryset = Play.objects.all().prefetch_related("genres", "actors")
     serializer_class = PlaySerializer
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminAllORIsAuthenticatedORReadOnly,)
 
     @staticmethod
     def params_to_ints(qs):
@@ -98,6 +103,7 @@ class PerformanceViewset(viewsets.ModelViewSet):
     )
     serializer_class = PerformanceSerializer
     authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminAllORIsAuthenticatedORReadOnly,)
 
     def get_queryset(self):
         date = self.request.query_params.get("date")
