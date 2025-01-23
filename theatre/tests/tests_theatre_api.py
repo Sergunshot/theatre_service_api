@@ -106,3 +106,12 @@ class AuthenticatedMovieAPITests(TestCase):
         self.assertIn(play_first_serializer.data, res.data["results"])
         self.assertIn(play_second_serializer.data, res.data["results"])
         self.assertNotIn(play_serializer.data, res.data["results"])
+
+    def test_movie_by_title(self):
+        play = sample_play()
+        play_first = sample_play(title="First play")
+        res = self.client.get(PLAY_URL, {"title": play_first.title})
+        play_serializer = PlayListSerializer(play)
+        play_first_serializer = PlayListSerializer(play_first)
+        self.assertIn(play_first_serializer.data, res.data["results"])
+        self.assertNotIn(play_serializer.data, res.data["results"])
