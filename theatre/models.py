@@ -51,8 +51,8 @@ class Play(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.IntegerField()
-    genres = models.ManyToManyField(Genre, related_name="plays")
-    actors = models.ManyToManyField(Actor, related_name="plays")
+    genres = models.ManyToManyField(Genre, blank=True, related_name="plays")
+    actors = models.ManyToManyField(Actor, blank=True, related_name="plays")
     image = models.ImageField(null=True, blank=True, upload_to=play_image_path)
 
     class Meta:
@@ -63,7 +63,11 @@ class Play(models.Model):
 
 
 class Performance(models.Model):
-    play = models.ForeignKey(Play, related_name="performances", on_delete=models.CASCADE)
+    play = models.ForeignKey(
+        Play,
+        related_name="performances",
+        on_delete=models.CASCADE
+    )
     theatre_hall = models.ForeignKey(
         TheatreHall,
         related_name="performances",
@@ -74,7 +78,10 @@ class Performance(models.Model):
 
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return str(self.created_at)
@@ -112,7 +119,7 @@ class Ticket(models.Model):
                 raise error_to_raise(
                     {
                         ticket_attr_name: f"{ticket_attr_name} "
-                                          f"number must be in available range: "
+                                          f"number must be in available range:"
                                           f"(1, {theatre_hall_attr_name}): "
                                           f"(1, {count_attrs})"
                     }
