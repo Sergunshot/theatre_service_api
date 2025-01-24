@@ -136,3 +136,8 @@ class AuthenticatedMovieAPITests(TestCase):
         serializer = PlayDetailSerializer(play)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_play_forbidden(self):
+        payload = {"title": "Test play", "description": "Test play", "duration": 120}
+        res = self.client.post(PLAY_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
