@@ -1,4 +1,4 @@
-import pathlib
+import os
 import uuid
 
 from django.core.exceptions import ValidationError
@@ -40,10 +40,11 @@ class Genre(models.Model):
         return self.name
 
 
-def play_image_path(instance: "Play", filename):
-    filename = (f"{slugify(instance.title)}-{uuid.uuid4()}"
-                f"{pathlib.Path(filename).suffix}")
-    return pathlib.Path("uploads/movies/") / pathlib.Path(filename)
+def play_image_path(instance, filename):
+    _, extension = os.path.splitext(filename)
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+
+    return os.path.join("uploads/plays/", filename)
 
 
 class Play(models.Model):
@@ -52,7 +53,7 @@ class Play(models.Model):
     duration = models.IntegerField()
     genres = models.ManyToManyField(Genre, related_name="plays")
     actors = models.ManyToManyField(Actor, related_name="plays")
-    image = models.ImageField(null=True, upload_to=play_image_path)
+    image = models.ImageField(null=True, blank=True, upload_to=play_image_path)
 
     class Meta:
         ordering = ["title"]
