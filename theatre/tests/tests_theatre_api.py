@@ -12,6 +12,7 @@ from theatre.models import Play, Genre, Actor, TheatreHall, Performance
 from theatre.serializers import PlayListSerializer, PlayDetailSerializer
 
 PLAY_URL = reverse("theatre:play-list")
+PERFORMANCE_URL = reverse("theatre:performance-list")
 
 
 def sample_genre(**params):
@@ -308,3 +309,14 @@ class MovieImageUploadTests(TestCase):
         res = self.client.get(PLAY_URL)
 
         self.assertIn("image", res.data["results"][0].keys())
+
+    def test_image_url_is_shown_on_performance_detail(self):
+        url = image_upload_url(self.play.id)
+        with tempfile.NamedTemporaryFile(suffix=".jpg") as ntf:
+            img = Image.new("RGB", (10, 10))
+            img.save(ntf, format="JPEG")
+            ntf.seek(0)
+            self.client.post(url, {"image": ntf}, format="multipart")
+        res = self.client.get(PERFORMANCE_URL)
+
+        self.assertIn("play_image", res.data["results"][0].keys())
