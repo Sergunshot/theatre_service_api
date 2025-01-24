@@ -24,7 +24,7 @@ from theatre.serializers import (
     PlaySerializer,
     PerformanceSerializer,
     ReservationSerializer, PlayListSerializer, PlayDetailSerializer, PerformanceListSerializer,
-    PerformanceDetailSerializer, ReservationListSerializer
+    PerformanceDetailSerializer, ReservationListSerializer, PlayImageSerializer
 )
 
 
@@ -67,8 +67,13 @@ class PlayViewset(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return PlayListSerializer
+
         if self.action == "retrieve":
             return PlayDetailSerializer
+
+        if self.action == "upload_image":
+            return PlayImageSerializer
+
         return PlaySerializer
 
     @action(
@@ -77,15 +82,18 @@ class PlayViewset(viewsets.ModelViewSet):
         url_path="upload-image"
     )
     def upload_image(self, request, pk=None):
+        """Endpoint for uploading image to specific movie"""
         play = self.get_object()
         serializer = self.get_serializer(play, data=request.data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):
-        """Retrieve the movies with filters"""
+        """Retrieve the plays with filters"""
         title = self.request.query_params.get("title")
         genres = self.request.query_params.get("genres")
         actors = self.request.query_params.get("actors")
