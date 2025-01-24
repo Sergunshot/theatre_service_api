@@ -112,7 +112,10 @@ class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
         Ticket.validate_ticket(
-            attrs["row"], attrs["seat"], attrs["performance"], attrs["error_to_raise"]
+            attrs["row"],
+            attrs["seat"],
+            attrs["performance"],
+            attrs["error_to_raise"]
         )
         return data
 
