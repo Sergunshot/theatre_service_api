@@ -1,3 +1,7 @@
+import os
+import tempfile
+
+from PIL import Image
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -47,7 +51,7 @@ def sample_performance(**params):
     defaults = {
         "show_time": "2022-06-02 14:00:00",
         "play": None,
-        "cinema_hall": theatre_hall,
+        "theatre_hall": theatre_hall,
     }
     defaults.update(params)
 
@@ -222,3 +226,33 @@ class AdminMovieAPITests(TestCase):
         self.assertIn(genre_1, genres)
         self.assertIn(genre_2, genres)
         self.assertEqual(genres.count(), 2)
+
+
+class MovieImageUploadTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_superuser(
+            "admin@myproject.com", "password"
+        )
+        self.client.force_authenticate(self.user)
+        self.play = sample_play()
+        self.genre = sample_genre()
+        self.actor = sample_actor()
+        self.performance = sample_performance(play=self.play)
+
+    def tearDown(self):
+        self.play.image.delete()
+
+    def test_upload_image_to_play(self):
+        """Test uploading an image to play"""
+        url = image_upload_url(self.play.id)
+        with tempfile.NamedTemporaryFile(suffix=".jpg") as ntf:
+            img = Image.new("RGB", (10, 10))
+            img.save(ntf, format="JPEG")
+            ntf.seek(0)
+            res = self.client.post(url, {"image": ntf}, format="multipart")
+        self.play.refresh_from_db()
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("image", res.data)
+        self.assertTrue(os.path.exists(self.play.image.path))
