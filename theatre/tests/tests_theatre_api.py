@@ -38,7 +38,11 @@ def sample_play(**params):
 
 
 def sample_performance(**params):
-    theatre_hall = TheatreHall.objects.create(name="Blue", rows=20, seats_in_row=20)
+    theatre_hall = TheatreHall.objects.create(
+        name="Blue",
+        rows=20,
+        seats_in_row=20
+    )
 
     defaults = {
         "show_time": "2022-06-02 14:00:00",
@@ -92,7 +96,8 @@ class AuthenticatedMovieAPITests(TestCase):
         actor_2 = sample_actor(first_name="Jane", last_name="Doe")
         play_first.actors.add(actor_1)
         play_second.actors.add(actor_2)
-        res = self.client.get(PLAY_URL, {"actors": f"{actor_1.id},{actor_2.id}"})
+        res = self.client.get(PLAY_URL, {"actors": f"{actor_1.id},"
+                                                   f"{actor_2.id}"})
         play_first_serializer = PlayListSerializer(play_first)
         play_second_serializer = PlayListSerializer(play_second)
         play_serializer = PlayListSerializer(play)
@@ -108,7 +113,8 @@ class AuthenticatedMovieAPITests(TestCase):
         genre_2 = sample_genre(name="Adventure")
         play_first.genres.add(genre_1)
         play_second.genres.add(genre_2)
-        res = self.client.get(PLAY_URL, {"genres": f"{genre_1.id},{genre_2.id}"})
+        res = self.client.get(PLAY_URL, {"genres": f"{genre_1.id},"
+                                                   f"{genre_2.id}"})
         play_first_serializer = PlayListSerializer(play_first)
         play_second_serializer = PlayListSerializer(play_second)
         play_serializer = PlayListSerializer(play)
@@ -138,6 +144,35 @@ class AuthenticatedMovieAPITests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_create_play_forbidden(self):
-        payload = {"title": "Test play", "description": "Test play", "duration": 120}
+        payload = {
+            "title": "Test play",
+            "description": "Test play",
+            "duration": 120
+        }
         res = self.client.post(PLAY_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class AdminMovieAPITests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            email="admin@email.com", password="<PASSWORD>", is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_create_play(self):
+        payload = {
+            "title": "Test movie",
+            "description": "Test movie",
+            "duration": 120,
+        }
+
+        res = self.client.post(PLAY_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        play = Play.objects.get(id=res.data["id"])
+
+        for key in payload:
+            self.assertEqual(payload[key], getattr(play, key))
