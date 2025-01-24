@@ -199,3 +199,26 @@ class AdminMovieAPITests(TestCase):
         self.assertIn(actor_1, actors)
         self.assertIn(actor_2, actors)
         self.assertEqual(actors.count(), 2)
+
+    def test_create_play_with_genres(self):
+        genre_1 = sample_genre(name="Adventure")
+        genre_2 = sample_genre(name="Horror")
+
+        payload = {
+            "title": "Test play",
+            "description": "Test play",
+            "duration": 120,
+            "genres": [genre_1.id, genre_2.id],
+        }
+
+        res = self.client.post(PLAY_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        play = Play.objects.get(id=res.data["id"])
+
+        genres = play.genres.all()
+
+        self.assertIn(genre_1, genres)
+        self.assertIn(genre_2, genres)
+        self.assertEqual(genres.count(), 2)
