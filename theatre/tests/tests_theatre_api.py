@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from theatre.models import Play, Genre, Actor, TheatreHall, Performance
-from theatre.serializers import PlayListSerializer
+from theatre.serializers import PlayListSerializer, PlayDetailSerializer
 
 PLAY_URL = reverse("theatre:play-list")
 
@@ -50,6 +50,15 @@ def sample_performance(**params):
     return Performance.objects.create(**defaults)
 
 
+def image_upload_url(play_id):
+    """Return URL for recipe image upload"""
+    return reverse("theatre:play-upload-image", args=[play_id])
+
+
+def detail_url(play_id):
+    return reverse("theatre:play-detail", args=[play_id])
+
+
 class UnauthenticatedMovieAPITests(TestCase):
     def setUp(self):
         self.client = APIClient()
@@ -75,7 +84,7 @@ class AuthenticatedMovieAPITests(TestCase):
         serializer = PlayListSerializer(plays, many=True)
         self.assertEqual(res.data["results"], serializer.data)
 
-    def test_movies_by_actors(self):
+    def test_play_by_actors(self):
         play = sample_play()
         play_first = sample_play(title="First play")
         play_second = sample_play(title="Second play")
@@ -91,7 +100,7 @@ class AuthenticatedMovieAPITests(TestCase):
         self.assertIn(play_second_serializer.data, res.data["results"])
         self.assertNotIn(play_serializer.data, res.data["results"])
 
-    def test_movies_by_genres(self):
+    def test_play_by_genres(self):
         play = sample_play()
         play_first = sample_play(title="First play")
         play_second = sample_play(title="Second play")
@@ -107,7 +116,7 @@ class AuthenticatedMovieAPITests(TestCase):
         self.assertIn(play_second_serializer.data, res.data["results"])
         self.assertNotIn(play_serializer.data, res.data["results"])
 
-    def test_movie_by_title(self):
+    def test_play_by_title(self):
         play = sample_play()
         play_first = sample_play(title="First play")
         res = self.client.get(PLAY_URL, {"title": play_first.title})
@@ -115,3 +124,15 @@ class AuthenticatedMovieAPITests(TestCase):
         play_first_serializer = PlayListSerializer(play_first)
         self.assertIn(play_first_serializer.data, res.data["results"])
         self.assertNotIn(play_serializer.data, res.data["results"])
+
+    def test_play_detail(self):
+        play = sample_play()
+        genre = sample_genre(name="Horror")
+        actor = sample_actor(first_name="John", last_name="Doe")
+        play.genres.add(genre)
+        play.actors.add(actor)
+        url = detail_url(play.id)
+        res = self.client.get(url)
+        serializer = PlayDetailSerializer(play)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
