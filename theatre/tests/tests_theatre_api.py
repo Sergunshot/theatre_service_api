@@ -263,3 +263,26 @@ class MovieImageUploadTests(TestCase):
         res = self.client.post(url, {"image": "not image"}, format="multipart")
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_post_image_to_movie_list(self):
+        url = PLAY_URL
+        with tempfile.NamedTemporaryFile(suffix=".jpg") as ntf:
+            img = Image.new("RGB", (10, 10))
+            img.save(ntf, format="JPEG")
+            ntf.seek(0)
+            res = self.client.post(
+                url,
+                {
+                    "title": "Title",
+                    "description": "Description",
+                    "duration": 90,
+                    "genres": [1],
+                    "actors": [1],
+                    "image": ntf,
+                },
+                format="multipart",
+            )
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        play = Play.objects.get(title="Title")
+        self.assertFalse(play.image)
