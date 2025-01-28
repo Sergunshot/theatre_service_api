@@ -33,7 +33,7 @@ from theatre.serializers import (
 )
 
 
-class TheatreHallViewset(
+class TheatreHallViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     GenericViewSet
@@ -44,21 +44,21 @@ class TheatreHallViewset(
     permission_classes = (IsAdminAllORIsAuthenticatedORReadOnly,)
 
 
-class ActorViewset(viewsets.ModelViewSet):
+class ActorViewSet(viewsets.ModelViewSet):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminAllORIsAuthenticatedORReadOnly,)
 
 
-class GenreViewset(viewsets.ModelViewSet):
+class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminAllORIsAuthenticatedORReadOnly,)
 
 
-class PlayViewset(viewsets.ModelViewSet):
+class PlayViewSet(viewsets.ModelViewSet):
     queryset = Play.objects.all().prefetch_related("genres", "actors")
     serializer_class = PlaySerializer
     authentication_classes = (TokenAuthentication,)
@@ -140,7 +140,7 @@ class PlayViewset(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
-class PerformanceViewset(viewsets.ModelViewSet):
+class PerformanceViewSet(viewsets.ModelViewSet):
     queryset = (
         Performance.objects.all()
         .select_related("play", "theatre_hall")
@@ -180,7 +180,7 @@ class PerformanceViewset(viewsets.ModelViewSet):
         return PerformanceSerializer
 
 
-class ReservationViewset(viewsets.ModelViewSet):
+class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
     authentication_classes = (TokenAuthentication,)
