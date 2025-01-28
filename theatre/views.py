@@ -180,11 +180,7 @@ class PerformanceViewset(viewsets.ModelViewSet):
         return PerformanceSerializer
 
 
-class ReservationViewset(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    GenericViewSet
-):
+class ReservationViewset(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
     authentication_classes = (TokenAuthentication,)
